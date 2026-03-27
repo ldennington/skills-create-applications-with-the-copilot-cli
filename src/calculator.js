@@ -7,6 +7,9 @@
  *   * Multiplication – multiplies two numbers
  *   / Division       – divides the first number by the second
  *                      (division by zero is handled gracefully)
+ *   % Modulo         – returns the remainder of division
+ *   ** Exponentiation – raises the first number to the power of the second
+ *   sqrt Square root – returns the square root of a number
  */
 
 const readline = require("readline");
@@ -45,10 +48,31 @@ function divide(a, b) {
   return a / b;
 }
 
+// Modulo: returns the remainder of a divided by b
+function modulo(a, b) {
+  if (b === 0) {
+    return "Error: Division by zero is not allowed.";
+  }
+  return a % b;
+}
+
+// Exponentiation: returns base raised to the exponent
+function power(base, exponent) {
+  return Math.pow(base, exponent);
+}
+
+// Square root: returns the square root of n with error handling for negatives
+function squareRoot(n) {
+  if (n < 0) {
+    return "Error: Cannot calculate the square root of a negative number.";
+  }
+  return Math.sqrt(n);
+}
+
 async function main() {
   const rl = createInterface();
   console.log("=== Node.js CLI Calculator ===");
-  console.log("Supported operations: +, -, *, /\n");
+  console.log("Supported operations: +, -, *, /, %, **, sqrt\n");
 
   const num1 = parseFloat(await ask(rl, "Enter the first number: "));
   if (isNaN(num1)) {
@@ -57,9 +81,17 @@ async function main() {
     return;
   }
 
-  const operator = (await ask(rl, "Enter an operator (+, -, *, /): ")).trim();
-  if (!["+", "-", "*", "/"].includes(operator)) {
-    console.log("Error: Invalid operator. Please use +, -, *, or /.");
+  const operator = (await ask(rl, "Enter an operator (+, -, *, /, %, **, sqrt): ")).trim();
+  if (!["+", "-", "*", "/", "%", "**", "sqrt"].includes(operator)) {
+    console.log("Error: Invalid operator. Please use +, -, *, /, %, **, or sqrt.");
+    rl.close();
+    return;
+  }
+
+  // Square root only needs one number
+  if (operator === "sqrt") {
+    const result = squareRoot(num1);
+    console.log(`\nResult: sqrt(${num1}) = ${result}`);
     rl.close();
     return;
   }
@@ -85,6 +117,12 @@ async function main() {
     case "/":
       result = divide(num1, num2);
       break;
+    case "%":
+      result = modulo(num1, num2);
+      break;
+    case "**":
+      result = power(num1, num2);
+      break;
   }
 
   console.log(`\nResult: ${num1} ${operator} ${num2} = ${result}`);
@@ -96,4 +134,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { add, subtract, multiply, divide };
+module.exports = { add, subtract, multiply, divide, modulo, power, squareRoot };
